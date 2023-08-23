@@ -79,6 +79,8 @@ class AudioGen:
         if device is None:
             if torch.cuda.device_count():
                 device = 'cuda'
+            elif torch.has_mps:
+                device = 'mps'
             else:
                 device = 'cpu'
 

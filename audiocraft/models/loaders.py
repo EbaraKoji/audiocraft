@@ -103,6 +103,8 @@ def load_lm_model(file_or_url_or_id: tp.Union[Path, str], device='cpu', cache_di
     cfg.device = str(device)
     if cfg.device == 'cpu':
         cfg.dtype = 'float32'
+    elif cfg.device == 'mps':
+        cfg.dtype = 'float32'
     else:
         cfg.dtype = 'float16'
     _delete_param(cfg, 'conditioners.self_wav.chroma_stem.cache_path')
