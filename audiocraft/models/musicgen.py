@@ -63,7 +63,7 @@ class MusicGen:
         self.generation_params: dict = {}
         self.set_generation_params(duration=15)  # 15 seconds by default
         self._progress_callback: tp.Optional[tp.Callable[[int, int], None]] = None
-        if self.device.type == 'cpu':
+        if self.device.type == 'cpu' or self.device.type == 'mps':
             self.autocast = TorchAutocast(enabled=False)
         else:
             self.autocast = TorchAutocast(
