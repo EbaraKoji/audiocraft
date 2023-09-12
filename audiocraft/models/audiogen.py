@@ -132,7 +132,7 @@ class AudioGen:
         """Override the default progress callback."""
         self._progress_callback = progress_callback
 
-    def generate(self, descriptions: tp.List[str], progress: bool = False, debug_gen_tokens=False) -> torch.Tensor:
+    def generate(self, descriptions: tp.List[str], progress: bool = False, debug_tokens=False) -> torch.Tensor:
         """Generate samples conditioned on text.
 
         Args:
@@ -141,11 +141,11 @@ class AudioGen:
         """
         attributes, prompt_tokens = self._prepare_tokens_and_attributes(descriptions, None)
         assert prompt_tokens is None
-        return self._generate_tokens(attributes, prompt_tokens, progress, debug_gen_tokens=debug_gen_tokens)
+        return self._generate_tokens(attributes, prompt_tokens, progress, debug_tokens=debug_tokens)
 
     def generate_continuation(self, prompt: torch.Tensor, prompt_sample_rate: int,
                               descriptions: tp.Optional[tp.List[tp.Optional[str]]] = None,
-                              progress: bool = False) -> torch.Tensor:
+                              progress: bool = False, debug_tokens=False) -> torch.Tensor:
         """Generate samples conditioned on audio prompts.
 
         Args:
@@ -164,7 +164,7 @@ class AudioGen:
             descriptions = [None] * len(prompt)
         attributes, prompt_tokens = self._prepare_tokens_and_attributes(descriptions, prompt)
         assert prompt_tokens is not None
-        return self._generate_tokens(attributes, prompt_tokens, progress)
+        return self._generate_tokens(attributes, prompt_tokens, progress, debug_tokens=debug_tokens)
 
     @torch.no_grad()
     def _prepare_tokens_and_attributes(
@@ -194,7 +194,7 @@ class AudioGen:
 
     def _generate_tokens(self, attributes: tp.List[ConditioningAttributes],
                          prompt_tokens: tp.Optional[torch.Tensor], progress: bool = False,
-                         debug_gen_tokens=False) -> torch.Tensor:
+                         debug_tokens=False) -> torch.Tensor:
         """Generate discrete audio tokens given audio prompt and/or conditions.
 
         Args:
@@ -264,6 +264,6 @@ class AudioGen:
         with torch.no_grad():
             gen_audio = self.compression_model.decode(gen_tokens, None)
 
-        if debug_gen_tokens is True:
-            return gen_audio, gen_tokens
+        if debug_tokens is True:
+            return gen_audio, prompt_tokens, gen_tokens
         return gen_audio

@@ -232,7 +232,12 @@ class EncodecModel(CompressionModel):
         """
         assert x.dim() == 3
         x, scale = self.preprocess(x)
-        emb = self.encoder(x)
+        # emb = self.encoder(x)
+        if x.device.type == 'mps':
+            # XXX: Since mps-encoder does not work, cpu-encoder is used instead
+            emb = self.encoder.to('cpu')(x.to('cpu')).to('mps')
+        else:
+            emb = self.encoder(x)
         codes = self.quantizer.encode(emb)
         return codes, scale
 
